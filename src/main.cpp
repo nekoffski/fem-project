@@ -8,10 +8,10 @@ int main() {
 
     try {
         grid = std::make_unique<grid::Grid>(grid::GridConfig("mes.txt"));
+        grid->build();
     } catch (GridError& e) {
         return -1;
     }
 
-    
     return 0;
 }
