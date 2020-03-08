@@ -1,5 +1,7 @@
 #include <fem/grid/GridConfig.h>
 
+#include <json/json.h>
+
 #include <fstream>
 #include <sstream>
 #include <vector>
@@ -17,20 +19,23 @@ GridConfig::GridConfig(const std::string& configPath) {
         throw GridError();
     }
 
-    std::vector<std::string> lines;
-    std::string tmp;
+    Json::Value root;
+    Json::CharReaderBuilder builder;
+    JSONCPP_STRING errs;
 
-    while (std::getline(configFile, tmp)) {
-        lines.push_back(tmp);
-    }
-
-    if (lines.size() != CONFIG_LINES) {
+    if (!Json::parseFromStream(builder, configFile, &root, &errs)) {
         throw GridError();
     }
 
-    width = std::atof(lines[0].c_str());
-    height = std::atof(lines[1].c_str());
-    nodesX = std::atoi(lines[2].c_str());
-    nodesY = std::atoi(lines[3].c_str());
+    try {
+        auto& grid = root["grid"];
+
+        width = grid["width"].asDouble();
+        height = grid["height"].asDouble();
+        nodesX = grid["nodes_x"].asInt();
+        nodesY = grid["nodes_y"].asInt();
+    } catch (Json::Exception& e) {
+        throw GridError();
+    }
 }
 }

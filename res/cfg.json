@@ -1,0 +1,8 @@
+{
+    "grid": {
+        "width": 0.2,
+        "height": 0.5,
+        "nodes_x": 4,
+        "nodes_y": 5
+    }
+}
