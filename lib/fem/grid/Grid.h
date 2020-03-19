@@ -30,6 +30,8 @@ public:
         return m_dy;
     }
 
+    void print() const;
+
 private:
     std::vector<Node> m_nodes;
     std::vector<Element> m_elements;

@@ -1,5 +1,7 @@
 #include <fem/grid/Grid.h>
 
+#include <iostream>
+
 namespace fem::grid {
 
 Grid::Grid(GridConfig cfg)
@@ -26,6 +28,16 @@ void Grid::build() {
         if ((i + 1) % m_elementsY == 0) {
             ++bias;
         }
+    }
+}
+
+void Grid::print() const {
+    for (unsigned i = 0; i < m_elementsX + 1; ++i) {
+        for (unsigned j = 0; j < m_elementsY + 1; ++j) {
+            auto& c = m_nodes[i * (m_elementsX + 1) + j].coords;
+            std::cout << c.first << '-' << c.second << ' ';
+        }
+        std::cout << '\n';
     }
 }
 }
