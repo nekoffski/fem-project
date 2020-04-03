@@ -52,6 +52,5 @@ static IntegralSolver2DTestCase testCases2D[] {
     [](float x, float y) { return x + y; }, 0.0f
 };
 
-
 INSTANTIATE_TEST_CASE_P(_, IntegralSolver1DTests, ::testing::ValuesIn(testCases1D));
 INSTANTIATE_TEST_CASE_P(_, IntegralSolver2DTests, ::testing::ValuesIn(testCases2D));

@@ -3,33 +3,26 @@
 #include <fem/Errors.h>
 #include <fem/grid/Grid.h>
 #include <fem/math/IntegralSolver.hpp>
+#include <fem/math/JacobianSolver.h>
+#include <fem/math/MatrixHSolver.hpp>
 
 using namespace fem;
 
 int main() {
-    // std::unique_ptr<grid::Grid> grid;
+    math::JacobianSolver jacobianSolver;
 
-    // try {
-    //     grid = std::make_unique<grid::Grid>(grid::GridConfig(1, 1, 5, 5));
-    //     grid->build();
-    // } catch (GridError& e) {
-    //     std::cout << "Error while creating grid.\n";
-    //     return -1;
-    // }
-
-    // grid->print();
-
-    auto fun1 = [](float x) {
-        return 5 * x * x + 3 * x + 6;
+    std::vector<math::Point> points{
+        { 0.0f, 0.0f },
+        { 0.025f, 0.0f },
+        { 0.025f, 0.025f },
+        { 0.0f, 0.025f }
     };
 
-    auto fun2 = [](float x, float y) {
-        return 5 * x * x * y * y + 3 * x * y + 6;
-    };
+    constexpr float K = 30.0f;
+    auto [dx, dy, jacobians] = jacobianSolver.calculateDerivatives(points);
+    auto h = fem::math::calculateHMatrix(dx, dy, jacobians, K);
 
-    
-    std::cout << math::solveIntegral<float>(fun1) << '\n';
-    std::cout << math::solveIntegral<float>(fun2) << '\n';
+    std::cout << h;
 
     return 0;
 }
