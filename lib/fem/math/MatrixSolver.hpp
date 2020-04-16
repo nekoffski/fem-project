@@ -6,7 +6,7 @@
 
 namespace fem::math {
 
-inline Mat4 calculateHMatrix(const Mat4& dx, const Mat4& dy, std::array<float, 4> jac, const float k = 30.0f) {
+inline Mat4 calculateHMatrix(const Mat4& dx, const Mat4& dy, std::array<float, 4> jac, const float k = 25.0f) {
     Mat4 h{};
 
     for (int i = 0; i < 4; ++i)

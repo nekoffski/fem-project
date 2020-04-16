@@ -55,9 +55,9 @@ inline float dN4_deta(float ksi) {
 
 inline std::vector<fem::math::Point> localPoints{
     { -1.0f / fem::math::SQRT3, -1.0f / fem::math::SQRT3 }, // p1
+    { -1.0f / fem::math::SQRT3, 1.0f / fem::math::SQRT3 }, // p4
     { 1.0f / fem::math::SQRT3, -1.0f / fem::math::SQRT3 }, // p2
-    { 1.0f / fem::math::SQRT3, 1.0f / fem::math::SQRT3 }, // p3
-    { -1.0f / fem::math::SQRT3, 1.0f / fem::math::SQRT3 } // p4
+    { 1.0f / fem::math::SQRT3, 1.0f / fem::math::SQRT3 } // p3
 };
 
 inline std::vector<std::function<float(float)>> dksis{
