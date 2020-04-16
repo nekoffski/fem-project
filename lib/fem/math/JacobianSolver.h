@@ -4,6 +4,7 @@
 #include <functional>
 #include <vector>
 
+#include <fem/math/UniversalElement.h>
 #include <fem/math/Utils.hpp>
 
 namespace fem::math {
@@ -21,13 +22,12 @@ struct Jacobians {
 
 class JacobianSolver {
 public:
-    explicit JacobianSolver();
+    explicit JacobianSolver(UniversalElement);
     Jacobians calculateJacobians(std::vector<Point> points);
 
     DerivativesTables calculateDerivatives(std::vector<Point> points);
 
 private:
-    Mat4 dksi;
-    Mat4 deta;
+    UniversalElement ue;
 };
 }
