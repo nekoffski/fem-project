@@ -1,3 +1,4 @@
+#include <cmath>
 #include <fem/grid/Grid.h>
 #include <fem/grid/GridConfig.h>
 
@@ -16,10 +17,10 @@ protected:
     GridConfig m_gridConfig;
     std::unique_ptr<Grid> m_grid;
 
-    float m_width{ 200.0f };
-    float m_height{ 100.0f };
-    int m_nodesX{ 5 };
-    int m_nodesY{ 10 };
+    float m_width{ 0.100f };
+    float m_height{ 0.100f };
+    int m_nodesX{ 4 };
+    int m_nodesY{ 4 };
 };
 
 TEST_F(GridTests, test_givenGridConfig_whenCreatingGrid_expectCorrectNodeCount) {
@@ -52,8 +53,15 @@ TEST_F(GridTests, test_givenGridConfig_whenCreatingGrid_expectCorrectCoordinates
     auto begin = std::pair<float, float>(0.0f, 0.0f);
     auto end = std::pair<float, float>(m_width, m_height);
 
-    EXPECT_EQ(nodes[0].coords, begin);
-    EXPECT_EQ(nodes.back().coords, end);
+    auto floatEqual = [](float lhs, float rhs) -> bool {
+        constexpr float delta = 0.01f;
+        return std::fabs(lhs - rhs) < delta;
+    };
+
+    EXPECT_TRUE(floatEqual(nodes[0].coords.first, begin.first));
+    EXPECT_TRUE(floatEqual(nodes[0].coords.second, begin.second));
+    EXPECT_TRUE(floatEqual(nodes.back().coords.first, end.first));
+    EXPECT_TRUE(floatEqual(nodes.back().coords.second, end.second));
 }
 
 struct TestParam {
@@ -64,22 +72,20 @@ struct TestParam {
 class GridParamTests : public GridTests, public testing::WithParamInterface<TestParam> {
 };
 
-auto testCase1 = TestParam{ 0, { 0, 1, 3, 4 } };
-auto testCase2 = TestParam{ 1, { 1, 2, 4, 5 } };
-auto testCase3 = TestParam{ 3, { 3, 4, 6, 7 } };
-auto testCase4 = TestParam{ 11, { 12, 13, 15, 16 } };
-auto testCase5 = TestParam{ 22, { 24, 25, 27, 28 } };
+auto testCase1 = TestParam{ 0, { 0, 1, 4, 5 } };
+auto testCase2 = TestParam{ 1, { 1, 2, 5, 6 } };
+auto testCase3 = TestParam{ 2, { 2, 3, 6, 7 } };
+auto testCase4 = TestParam{ 4, { 5, 6, 9, 10 } };
+auto testCase5 = TestParam{ 7, { 9, 10, 13, 14 } };
 
 TEST_P(GridParamTests, test_givenGrid_expectCorrectNodesInElement) {
     auto p = GetParam();
     const auto& element = m_grid->getElements().at(p.id);
 
     auto& nodes = element.nodesIds;
-    for (auto node : p.nodes) {
-        if (auto it = std::find(nodes.begin(), nodes.end(), node); it == element.nodesIds.end()) {
+    for (auto node : p.nodes)
+        if (auto it = std::find(nodes.begin(), nodes.end(), node); it == element.nodesIds.end())
             FAIL();
-        }
-    }
 }
 
 INSTANTIATE_TEST_CASE_P(_, GridParamTests, ::testing::Values(testCase1, testCase2, testCase3, testCase4, testCase5));
