@@ -49,4 +49,16 @@ DerivativesTables JacobianSolver::calculateDerivatives(std::vector<Point> points
     }
     return { xDerivatives, yDerivatives, dets };
 }
+
+std::vector<float> JacobianSolver::calculateBoundaryJacobian(std::vector<Point> points) {
+    const auto n = points.size();
+    std::vector<float> res(n - 1);
+
+    for (int i = 0; i < n - 1; ++i) {
+        const auto [xb, yb] = points[i];
+        const auto [xe, ye] = points[i + 1];
+        res[i] = (std::abs(xe - xb) + std::abs(ye - yb)) / 2.0f;
+    }
+    return res;
+}
 }

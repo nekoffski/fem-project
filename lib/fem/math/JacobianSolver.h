@@ -6,6 +6,7 @@
 
 #include <fem/math/UniversalElement.h>
 #include <fem/math/Utils.hpp>
+#include <fem/grid/Node.h>
 
 namespace fem::math {
 
@@ -24,6 +25,8 @@ class JacobianSolver {
 public:
     explicit JacobianSolver(UniversalElement);
     Jacobians calculateJacobians(std::vector<Point> points);
+    
+    std::vector<float> calculateBoundaryJacobian(std::vector<Point>);
 
     DerivativesTables calculateDerivatives(std::vector<Point> points);
 

@@ -60,6 +60,17 @@ inline std::vector<fem::math::Point> localPoints{
     { 1.0f / fem::math::SQRT3, 1.0f / fem::math::SQRT3 } // p3
 };
 
+inline std::vector<fem::math::Point> boundaryPoints {
+    { -1.0f, 1.0f / fem::math::SQRT3 },
+    { -1.0f, -1.0f / fem::math::SQRT3 },
+    { -1.0f / fem::math::SQRT3, -1.0f },
+    { 1.0f / fem::math::SQRT3, -1.0f },
+    { 1.0f, -1.0f / fem::math::SQRT3 },
+    { 1.0f, 1.0f / fem::math::SQRT3 },
+    { 1.0f / fem::math::SQRT3, 1.0f },
+    { -1.0f / fem::math::SQRT3, 1.0f }
+};
+
 inline std::vector<std::function<float(float)>> dksis{
     dN1_dksi, dN2_dksi, dN3_dksi, dN4_dksi
 };
@@ -81,6 +92,13 @@ UniversalElement::UniversalElement() {
             deta[i][j] = detas[j](p.x);
         for (int j = 0; j < 4; ++j)
             shapeFunctions[i][j] = shapes[j](p.x, p.y);
+    }
+
+    for (int i = 0; i < 8; ++i) {
+        const auto& p = boundaryPoints[i];
+        for (int j = 0; j < 4; ++j) {
+           boundaryShapeFunctions[i][j] = shapes[j](p.x, p.y);
+        }
     }
 }
 }

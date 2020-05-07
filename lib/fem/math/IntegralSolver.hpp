@@ -28,9 +28,8 @@ std::unordered_map<int, NodeWeightVector> nodeWeightMap {
 template<typename T>
 T solveIntegral(std::function<T(T)> fun, int N = 2) {
     T res = 0;
-    for (const auto &[node, weight] : nodeWeightMap.at(N)) {
+    for (const auto &[node, weight] : nodeWeightMap.at(N)) 
         res += fun(node) * weight;
-    }
     return res;
 }
 

@@ -11,5 +11,6 @@ struct Element {
     std::vector<int> nodesIds;
     math::Mat4 H;
     math::Mat4 C;
+    math::Mat4 P;
 };
 }

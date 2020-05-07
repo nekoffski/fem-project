@@ -14,6 +14,7 @@ struct Point {
 };
 
 using Mat4 = std::array<std::array<float, 4>, 4>;
+using Mat8x4 = std::array<std::array<float, 4>, 8>;
 using Mat2 = std::array<std::array<float, 2>, 2>;
 }
 
@@ -29,4 +30,21 @@ inline std::ostream& operator<<(std::ostream& s, const fem::math::Mat4& m) {
       << m[2][0] << " " << m[2][1] << " " << m[2][2] << " " << m[2][3] << '\n'
       << m[3][0] << " " << m[3][1] << " " << m[3][2] << " " << m[3][3] << '\n';
     return s;
+}
+
+inline std::ostream& operator<<(std::ostream& s, const fem::math::Mat8x4& m) {
+    for (int i = 0; i < 8; ++i) {
+        for (int j = 0; j < 4; ++j)
+            s << m[i][j] << " ";
+        s << "\n";
+    }
+    return s;
+}
+
+inline fem::math::Mat4 operator+(const fem::math::Mat4& lhs, const fem::math::Mat4& rhs) {
+    fem::math::Mat4 res{};
+    for (int i = 0; i < 4; ++i)
+        for (int j = 0; j < 4; ++j)
+            res[i][j] = lhs[i][j] + rhs[i][j];
+    return res;
 }
