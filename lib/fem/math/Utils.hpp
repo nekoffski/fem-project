@@ -13,6 +13,13 @@ struct Point {
     float y;
 };
 
+enum class Boundary : unsigned char {
+    LEFT = 0,
+    BOTTOM = 1,
+    RIGHT = 2,
+    TOP = 3
+};
+
 using Mat4 = std::array<std::array<float, 4>, 4>;
 using Mat8x4 = std::array<std::array<float, 4>, 8>;
 using Mat2 = std::array<std::array<float, 2>, 2>;

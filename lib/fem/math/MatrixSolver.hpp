@@ -7,13 +7,6 @@
 
 namespace fem::math {
 
-enum class Boundary : unsigned char {
-    LEFT = 0,
-    BOTTOM = 1,
-    RIGHT = 2,
-    TOP = 3
-};
-
 inline std::unordered_map<Boundary, std::array<int, 2>> boundaryToPoints = {
     { Boundary::LEFT, { 0, 1 } },
     { Boundary::BOTTOM, { 2, 3 } },

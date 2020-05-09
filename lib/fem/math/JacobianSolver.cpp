@@ -2,6 +2,7 @@
 
 #include <array>
 #include <functional>
+#include <iostream>
 #include <vector>
 
 #include <cmath>
@@ -54,9 +55,9 @@ std::vector<float> JacobianSolver::calculateBoundaryJacobian(std::vector<Point> 
     const auto n = points.size();
     std::vector<float> res(n - 1);
 
-    for (int i = 0; i < n - 1; ++i) {
+    for (int i = 0; i < n; ++i) {
         const auto [xb, yb] = points[i];
-        const auto [xe, ye] = points[i + 1];
+        const auto [xe, ye] = points[(i + 1) % n];
         res[i] = (std::abs(xe - xb) + std::abs(ye - yb)) / 2.0f;
     }
     return res;

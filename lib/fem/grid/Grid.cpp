@@ -28,6 +28,9 @@ void Grid::runSimulation() {
         auto [dx, dy, jacobians] = m_jacobianSolver.calculateDerivatives(points);
         element.H = math::calculateHMatrix(dx, dy, jacobians);
         element.C = math::calculateCMatrix(m_ue.shapeFunctions, jacobians);
+        auto P = math::calculatePVector(element.boundariesWithBC, m_ue.boundaryShapeFunctions,
+            m_jacobianSolver.calculateBoundaryJacobian(points));
+        // element.H += P;
     }
     aggregate();
 }
@@ -52,12 +55,16 @@ void Grid::build() {
 
     for (int i = 0; i < m_elementsX * m_elementsY; ++i) {
         int biasedI = i + bias;
-        m_elements.push_back(Element{ {
+
+        auto element = Element{ {
             biasedI,
             biasedI + 3 + wbias,
             biasedI + 4 + wbias,
             biasedI + 1,
-        } });
+        } };
+
+        determineElementBoundaryConditions(element, m_nodes);
+        m_elements.push_back(std::move(element));
 
         if ((i + 1) % m_elementsY == 0)
             ++bias;
