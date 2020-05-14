@@ -2,6 +2,8 @@
 
 #include <vector>
 
+#include <Eigen/Dense>
+
 #include <fem/grid/Node.h>
 #include <fem/math/Utils.hpp>
 
@@ -11,12 +13,12 @@ struct Element {
     explicit Element(std::vector<int> nodesIds)
         : nodesIds(std::move(nodesIds)) {
     }
-
     std::vector<int> nodesIds;
+
     std::vector<math::Boundary> boundariesWithBC;
-    math::Mat4 H;
-    math::Mat4 C;
-    math::Mat4 P;
+    Eigen::Matrix<float, 4, 4> H;
+    Eigen::Matrix<float, 4, 4> C;
+    Eigen::Vector<float, 4> P;
 };
 
 inline void determineElementBoundaryConditions(Element& element, const std::vector<Node>& nodes) {

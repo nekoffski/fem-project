@@ -4,6 +4,8 @@
 #include <cmath>
 #include <sstream>
 
+#include <Eigen/Dense>
+
 namespace fem::math {
 
 const float SQRT3 = std::sqrt(3.0f);
@@ -20,9 +22,10 @@ enum class Boundary : unsigned char {
     TOP = 3
 };
 
-using Mat4 = std::array<std::array<float, 4>, 4>;
-using Mat8x4 = std::array<std::array<float, 4>, 8>;
-using Mat2 = std::array<std::array<float, 2>, 2>;
+using Mat4 = Eigen::Matrix<float, 4, 4>; //std::array<std::array<float, 4>, 4>;
+using Mat8x4 = Eigen::Matrix<float, 8, 4>; //std::array<std::array<float, 4>, 8>;
+using Mat2 = Eigen::Matrix<float, 2, 2>; //std::array<std::array<float, 2>, 2>;
+using Vec4 = Eigen::Vector<float, 2>; //std::array<float, 4>;
 }
 
 inline std::ostream& operator<<(std::ostream& s, const fem::math::Mat2& m) {
@@ -36,6 +39,12 @@ inline std::ostream& operator<<(std::ostream& s, const fem::math::Mat4& m) {
       << m[1][0] << " " << m[1][1] << " " << m[1][2] << " " << m[1][3] << '\n'
       << m[2][0] << " " << m[2][1] << " " << m[2][2] << " " << m[2][3] << '\n'
       << m[3][0] << " " << m[3][1] << " " << m[3][2] << " " << m[3][3] << '\n';
+    return s;
+}
+
+inline std::ostream& operator<<(std::ostream& s, const fem::math::Vec4& v) {
+    for (int i = 0; i < 4; ++i)
+        s << v[i] << ' ';
     return s;
 }
 
