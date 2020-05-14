@@ -18,6 +18,8 @@ Grid::Grid(GridConfig cfg)
 }
 
 void Grid::runSimulation() {
+    // float timestep = m_gridConfig.timestep;
+    // for (float t = 0.0f; not floatCmp(t, m_gridConfig.duration); t += timestep) {
     for (auto& element : m_elements) {
         std::vector<math::Point> points;
         for (const auto& nodeId : element.nodesIds) {
@@ -26,13 +28,20 @@ void Grid::runSimulation() {
                 node.coords.first, node.coords.second });
         }
         auto [dx, dy, jacobians] = m_jacobianSolver.calculateDerivatives(points);
-        element.H = math::calculateHMatrix(dx, dy, jacobians);
         element.C = math::calculateCMatrix(m_ue.shapeFunctions, jacobians);
+        auto H = math::calculateHMatrix(dx, dy, jacobians);
+        auto HBC = math::calculateHBCMatrix(element.boundariesWithBC, m_ue.boundaryShapeFunctions,
+            m_jacobianSolver.calculateBoundaryJacobian(points));
+        std::cout << HBC << "\n\n";
+        element.H = std::move(H) + HBC;
+        // TODO: aggregate P vector
         auto P = math::calculatePVector(element.boundariesWithBC, m_ue.boundaryShapeFunctions,
             m_jacobianSolver.calculateBoundaryJacobian(points));
-        // element.H += P;
+        element.P = std::move(P);
     }
     aggregate();
+    solveEquations();
+    // }
 }
 
 void Grid::build() {

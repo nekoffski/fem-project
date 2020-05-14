@@ -10,6 +10,8 @@
 #include <fem/math/JacobianSolver.h>
 #include <fem/math/UniversalElement.h>
 
+#include <Eigen/Dense>
+
 namespace fem::grid {
 
 class Grid {
@@ -41,10 +43,55 @@ public:
         return m_aggregatedH;
     }
 
+    const UndefinedSizeVec& getAggregatedP() {
+        return m_aggregatedP;
+    }
+
+    void solveEquations() {
+        Eigen::Matrix<float, 16, 16> A;
+
+        const float dt = 50.0f;
+
+        auto C = m_aggregatedC;
+        auto P = m_aggregatedP;
+        auto H = m_aggregatedH;
+
+        grid::UndefinedSizeVec t0(16, 100.0f);
+
+        auto Cdt = C / dt;
+        auto Hc = H + Cdt;
+
+        std::cout << Hc;
+
+        auto C2 = Cdt * t0;
+        auto B = C2 + P;
+
+        std::cout << "\n\n"
+                  << B;
+
+        for (int i = 0; i < 16; ++i)
+            for (int j = 0; j < 16; ++j)
+                A(i, j) = Hc[i][j];
+        A = A.inverse();
+
+        for (int i = 0; i < 16; ++i)
+            for (int j = 0; j < 16; ++j)
+                Hc[i][j] = A(i, j);
+
+        std::cout << "\n\n"
+                  << Hc;
+        auto t1 = Hc * B;
+        std::cout << "\n\n"
+                  << t1;
+
+        t0 = t1;
+    }
+
     void aggregate() {
         auto m = aggregateMatrices(m_elements, m_nodes.size());
         m_aggregatedC = m.C;
         m_aggregatedH = m.H;
+        m_aggregatedP = m.P;
     }
 
     void runSimulation();
@@ -65,6 +112,7 @@ private:
 
     UndefinedSizeMat m_aggregatedC;
     UndefinedSizeMat m_aggregatedH;
+    UndefinedSizeVec m_aggregatedP;
 
     math::UniversalElement m_ue;
     math::JacobianSolver m_jacobianSolver;

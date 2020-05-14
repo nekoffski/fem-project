@@ -35,7 +35,7 @@ inline Mat4 calculateCMatrix(const Mat4& shapes, std::array<float, 4> jac, const
     return c;
 }
 
-inline Mat4 calculatePVector(std::vector<Boundary> boundaries, Mat8x4 bs, std::vector<float> jacobians) {
+inline Mat4 calculateHBCMatrix(std::vector<Boundary> boundaries, Mat8x4 bs, std::vector<float> jacobians) {
     Mat4 p{};
     for (const auto& boundary : boundaries) {
         const auto& points = boundaryToPoints[boundary];
@@ -43,7 +43,19 @@ inline Mat4 calculatePVector(std::vector<Boundary> boundaries, Mat8x4 bs, std::v
 
         for (int i = 0; i < 4; ++i)
             for (int j = 0; j < 4; ++j)
-                p[i][j] += (bs[points[0]][i] * bs[points[0]][j] + bs[points[1]][i] * bs[points[1]][j]) * jacobian * 25;
+                p[i][j] += (bs[points[0]][i] * bs[points[0]][j] + bs[points[1]][i] * bs[points[1]][j]) * jacobian * 300;
+    }
+    return p;
+}
+
+inline Vec4 calculatePVector(std::vector<Boundary> boundaries, Mat8x4 bs, std::vector<float> jacobians, float t = 1200.0f) {
+    Vec4 p{};
+    for (const auto& boundary : boundaries) {
+        const auto& points = boundaryToPoints[boundary];
+        const auto jacobian = jacobians[static_cast<int>(boundary)];
+
+        for (int i = 0; i < 4; ++i)
+            p[i] += (bs[points[0]][i] + bs[points[1]][i]) * jacobian * 300 * t;
     }
     return p;
 }
