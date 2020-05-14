@@ -16,9 +16,9 @@ struct Element {
     std::vector<int> nodesIds;
 
     std::vector<math::Boundary> boundariesWithBC;
-    Eigen::Matrix<float, 4, 4> H;
-    Eigen::Matrix<float, 4, 4> C;
-    Eigen::Vector<float, 4> P;
+    math:: Mat4 H;
+    math::Mat4 C;
+    math::Vec4 P;
 };
 
 inline void determineElementBoundaryConditions(Element& element, const std::vector<Node>& nodes) {

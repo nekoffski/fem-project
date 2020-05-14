@@ -22,10 +22,10 @@ enum class Boundary : unsigned char {
     TOP = 3
 };
 
-using Mat4 = Eigen::Matrix<float, 4, 4>; //std::array<std::array<float, 4>, 4>;
-using Mat8x4 = Eigen::Matrix<float, 8, 4>; //std::array<std::array<float, 4>, 8>;
-using Mat2 = Eigen::Matrix<float, 2, 2>; //std::array<std::array<float, 2>, 2>;
-using Vec4 = Eigen::Vector<float, 2>; //std::array<float, 4>;
+using Mat4 = std::array<std::array<float, 4>, 4>;
+using Mat8x4 = std::array<std::array<float, 4>, 8>;
+using Mat2 = std::array<std::array<float, 2>, 2>;
+using Vec4 = std::array<float, 4>;
 }
 
 inline std::ostream& operator<<(std::ostream& s, const fem::math::Mat2& m) {
