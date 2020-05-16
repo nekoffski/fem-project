@@ -14,34 +14,35 @@ namespace fem::grid {
 Grid::Grid(GridConfig cfg)
     : m_gridConfig(std::move(cfg))
     , m_ue()
-    , m_jacobianSolver(m_ue) {
+    , m_jacobianSolver(m_ue)
+    , m_temperature(16, 100.0f) {
 }
 
 void Grid::runSimulation() {
-    // float timestep = m_gridConfig.timestep;
-    // for (float t = 0.0f; not floatCmp(t, m_gridConfig.duration); t += timestep) {
-    for (auto& element : m_elements) {
-        std::vector<math::Point> points;
-        for (const auto& nodeId : element.nodesIds) {
-            auto& node = m_nodes[nodeId];
-            points.emplace_back(math::Point{
-                node.coords.first, node.coords.second });
+    int iteration = 0;
+    float timestep = m_gridConfig.timestep;
+    for (float t = 0.0f; t < m_gridConfig.duration; t += timestep) {
+        for (auto& element : m_elements) {
+            std::vector<math::Point> points;
+            for (const auto& nodeId : element.nodesIds) {
+                auto& node = m_nodes[nodeId];
+                points.emplace_back(math::Point{
+                    node.coords.first, node.coords.second });
+            }
+            auto [dx, dy, jacobians] = m_jacobianSolver.calculateDerivatives(points);
+            element.C = math::calculateCMatrix(m_ue.shapeFunctions, jacobians);
+            auto H = math::calculateHMatrix(dx, dy, jacobians);
+            auto HBC = math::calculateHBCMatrix(element.boundariesWithBC, m_ue.boundaryShapeFunctions,
+                m_jacobianSolver.calculateBoundaryJacobian(points));
+            element.H = std::move(H) + HBC;
+            auto P = math::calculatePVector(element.boundariesWithBC, m_ue.boundaryShapeFunctions,
+                m_jacobianSolver.calculateBoundaryJacobian(points));
+            element.P = std::move(P);
         }
-        auto [dx, dy, jacobians] = m_jacobianSolver.calculateDerivatives(points);
-        element.C = math::calculateCMatrix(m_ue.shapeFunctions, jacobians);
-        auto H = math::calculateHMatrix(dx, dy, jacobians);
-        auto HBC = math::calculateHBCMatrix(element.boundariesWithBC, m_ue.boundaryShapeFunctions,
-            m_jacobianSolver.calculateBoundaryJacobian(points));
-        std::cout << HBC << "\n\n";
-        element.H = std::move(H) + HBC;
-        // TODO: aggregate P vector
-        auto P = math::calculatePVector(element.boundariesWithBC, m_ue.boundaryShapeFunctions,
-            m_jacobianSolver.calculateBoundaryJacobian(points));
-        element.P = std::move(P);
+        aggregate();
+        solveEquations();
+        printMinMaxTemperature(t + timestep);
     }
-    aggregate();
-    solveEquations();
-    // }
 }
 
 void Grid::build() {

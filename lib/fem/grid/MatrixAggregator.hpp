@@ -4,6 +4,8 @@
 #include <ostream>
 #include <vector>
 
+#include <Eigen/Dense>
+
 #include <fem/grid/Element.h>
 
 namespace fem::grid {
@@ -38,6 +40,20 @@ inline AggregatedMatrices aggregateMatrices(const std::vector<Element>& elements
         }
     }
     return aggregatedMatrices;
+}
+
+inline UndefinedSizeMat inverseMatrix(const UndefinedSizeMat& matrix) {
+    auto res = matrix;
+    int n = matrix.size();
+    Eigen::MatrixXf m(n, n);
+    for (int i = 0; i < n; ++i)
+        for (int j = 0; j < n; ++j)
+            m(i, j) = matrix[i][j];
+    m = m.inverse();
+    for (int i = 0; i < n; ++i)
+        for (int j = 0; j < n; ++j)
+            res[i][j] = m(i, j);
+    return res;
 }
 }
 

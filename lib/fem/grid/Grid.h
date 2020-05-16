@@ -48,43 +48,16 @@ public:
     }
 
     void solveEquations() {
-        Eigen::Matrix<float, 16, 16> A;
-
         const float dt = 50.0f;
 
-        auto C = m_aggregatedC;
-        auto P = m_aggregatedP;
-        auto H = m_aggregatedH;
+        auto Cdt = m_aggregatedC / dt;
+        auto Hc = m_aggregatedH + Cdt;
 
-        grid::UndefinedSizeVec t0(16, 100.0f);
+        auto C2 = Cdt * m_temperature;
+        auto B = C2 + m_aggregatedP;
 
-        auto Cdt = C / dt;
-        auto Hc = H + Cdt;
-
-        std::cout << Hc;
-
-        auto C2 = Cdt * t0;
-        auto B = C2 + P;
-
-        std::cout << "\n\n"
-                  << B;
-
-        for (int i = 0; i < 16; ++i)
-            for (int j = 0; j < 16; ++j)
-                A(i, j) = Hc[i][j];
-        A = A.inverse();
-
-        for (int i = 0; i < 16; ++i)
-            for (int j = 0; j < 16; ++j)
-                Hc[i][j] = A(i, j);
-
-        std::cout << "\n\n"
-                  << Hc;
-        auto t1 = Hc * B;
-        std::cout << "\n\n"
-                  << t1;
-
-        t0 = t1;
+        auto t1 = inverseMatrix(Hc) * B;
+        m_temperature = t1;
     }
 
     void aggregate() {
@@ -94,11 +67,19 @@ public:
         m_aggregatedP = m.P;
     }
 
+    void printMinMaxTemperature(float time) {
+        auto [min, max] = std::minmax_element(m_temperature.begin(), m_temperature.end());
+        std::cout << "Time: " << time << " // min: " << *min << " - "
+                  << "max: " << *max << "\n";
+    }
+
     void runSimulation();
 
     void print() const;
 
 private:
+    UndefinedSizeVec m_temperature;
+
     std::vector<Node> m_nodes;
     std::vector<Element> m_elements;
 
