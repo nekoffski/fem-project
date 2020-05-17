@@ -1,3 +1,5 @@
+
+
 #include <fem/grid/Grid.h>
 #include <fem/math/MatrixSolver.hpp>
 
@@ -14,13 +16,17 @@ namespace fem::grid {
 Grid::Grid(GridConfig cfg)
     : m_gridConfig(std::move(cfg))
     , m_ue()
-    , m_jacobianSolver(m_ue)
-    , m_temperature(16, 100.0f) {
+    , m_jacobianSolver(m_ue) {
+    m_temperature = UndefinedSizeVec(m_gridConfig.nodesX * m_gridConfig.nodesY, 100.0f);
 }
 
 void Grid::runSimulation() {
     int iteration = 0;
+    Timer timer;
+    Timer t2;
+    Timer t3;
     float timestep = m_gridConfig.timestep;
+    t2.start("Total simulation time: ");
     for (float t = 0.0f; t < m_gridConfig.duration; t += timestep) {
         for (auto& element : m_elements) {
             std::vector<math::Point> points;
@@ -43,6 +49,7 @@ void Grid::runSimulation() {
         solveEquations();
         printMinMaxTemperature(t + timestep);
     }
+    t2.stop();
 }
 
 void Grid::build() {

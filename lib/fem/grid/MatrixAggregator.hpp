@@ -6,6 +6,7 @@
 
 #include <Eigen/Dense>
 
+#include <fem/Timer.hpp>
 #include <fem/grid/Element.h>
 
 namespace fem::grid {
@@ -43,16 +44,30 @@ inline AggregatedMatrices aggregateMatrices(const std::vector<Element>& elements
 }
 
 inline UndefinedSizeMat inverseMatrix(const UndefinedSizeMat& matrix) {
+    Timer t;
+
+    t.start("matrix copy\n");
     auto res = matrix;
+    t.stop();
     int n = matrix.size();
+    t.start("eigen build\n");
     Eigen::MatrixXf m(n, n);
+    t.stop();
+
+    t.start("matrxi rewrite\n");
     for (int i = 0; i < n; ++i)
         for (int j = 0; j < n; ++j)
             m(i, j) = matrix[i][j];
+
+    t.stop();
+    t.start("inverse\n");
     m = m.inverse();
+    t.stop();
+    t.start("matrix rewrite back\n");
     for (int i = 0; i < n; ++i)
         for (int j = 0; j < n; ++j)
             res[i][j] = m(i, j);
+    t.stop();
     return res;
 }
 }

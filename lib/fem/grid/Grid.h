@@ -3,6 +3,7 @@
 #include <memory>
 #include <vector>
 
+#include <fem/Timer.hpp>
 #include <fem/grid/Element.h>
 #include <fem/grid/GridConfig.h>
 #include <fem/grid/MatrixAggregator.hpp>
@@ -48,16 +49,29 @@ public:
     }
 
     void solveEquations() {
-        const float dt = 50.0f;
+        const float dt = m_gridConfig.timestep;
 
         auto Cdt = m_aggregatedC / dt;
         auto Hc = m_aggregatedH + Cdt;
-
         auto C2 = Cdt * m_temperature;
         auto B = C2 + m_aggregatedP;
 
-        auto t1 = inverseMatrix(Hc) * B;
-        m_temperature = t1;
+        int n = Hc.size();
+
+        Eigen::MatrixXf A(n, n);
+        Eigen::VectorXf temp(n);
+
+        for (int i = 0; i < n; ++i) {
+            temp(i) = B[i];
+            for (int j = 0; j < n; ++j)
+                A(i, j) = Hc[i][j];
+        }
+
+        // temp = A.lu().solve(temp);
+        temp = A.llt().solve(temp);
+
+        for (int i = 0; i < n; ++i)
+            m_temperature[i] = temp(i);
     }
 
     void aggregate() {
@@ -79,6 +93,7 @@ public:
 
 private:
     UndefinedSizeVec m_temperature;
+    // Eigen::VectorXf m_temperature;
 
     std::vector<Node> m_nodes;
     std::vector<Element> m_elements;
