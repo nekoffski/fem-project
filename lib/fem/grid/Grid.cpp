@@ -14,42 +14,7 @@ static inline bool floatCmp(float x, float y) {
 namespace fem::grid {
 
 Grid::Grid(GridConfig cfg)
-    : m_gridConfig(std::move(cfg))
-    , m_ue()
-    , m_jacobianSolver(m_ue) {
-    m_temperature = UndefinedSizeVec(m_gridConfig.nodesX * m_gridConfig.nodesY, 100.0f);
-}
-
-void Grid::runSimulation() {
-    int iteration = 0;
-    Timer timer;
-    Timer t2;
-    Timer t3;
-    float timestep = m_gridConfig.timestep;
-    t2.start("Total simulation time: ");
-    for (float t = 0.0f; t < m_gridConfig.duration; t += timestep) {
-        for (auto& element : m_elements) {
-            std::vector<math::Point> points;
-            for (const auto& nodeId : element.nodesIds) {
-                auto& node = m_nodes[nodeId];
-                points.emplace_back(math::Point{
-                    node.coords.first, node.coords.second });
-            }
-            auto [dx, dy, jacobians] = m_jacobianSolver.calculateDerivatives(points);
-            element.C = math::calculateCMatrix(m_ue.shapeFunctions, jacobians);
-            auto H = math::calculateHMatrix(dx, dy, jacobians);
-            auto HBC = math::calculateHBCMatrix(element.boundariesWithBC, m_ue.boundaryShapeFunctions,
-                m_jacobianSolver.calculateBoundaryJacobian(points));
-            element.H = std::move(H) + HBC;
-            auto P = math::calculatePVector(element.boundariesWithBC, m_ue.boundaryShapeFunctions,
-                m_jacobianSolver.calculateBoundaryJacobian(points));
-            element.P = std::move(P);
-        }
-        aggregate();
-        solveEquations();
-        printMinMaxTemperature(t + timestep);
-    }
-    t2.stop();
+    : m_gridConfig(std::move(cfg)) {
 }
 
 void Grid::build() {

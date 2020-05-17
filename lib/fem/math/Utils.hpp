@@ -4,6 +4,8 @@
 #include <cmath>
 #include <sstream>
 
+#include <fem/math/containers/Vector.hpp>
+
 #include <Eigen/Dense>
 
 namespace fem::math {
@@ -22,10 +24,64 @@ enum class Boundary : unsigned char {
     TOP = 3
 };
 
+using UndefinedSizeMat = std::vector<std::vector<float>>;
+using UndefinedSizeVec = std::vector<float>;
+
 using Mat4 = std::array<std::array<float, 4>, 4>;
 using Mat8x4 = std::array<std::array<float, 4>, 8>;
 using Mat2 = std::array<std::array<float, 2>, 2>;
 using Vec4 = std::array<float, 4>;
+}
+
+inline fem::math::UndefinedSizeVec operator+(const fem::math::UndefinedSizeVec& lhs, const fem::math::UndefinedSizeVec& rhs) {
+    fem::math::UndefinedSizeVec res = lhs;
+    for (int i = 0; i < lhs.size(); ++i)
+        res[i] += rhs[i];
+    return res;
+}
+
+inline fem::math::UndefinedSizeMat operator+(const fem::math::UndefinedSizeMat& lhs, const fem::math::UndefinedSizeMat& rhs) {
+    fem::math::UndefinedSizeMat res = lhs;
+    int n = lhs.size();
+    for (int i = 0; i < n; ++i)
+        for (int j = 0; j < n; ++j)
+            res[i][j] += rhs[i][j];
+    return res;
+}
+
+template <typename T>
+inline fem::math::containers::VectorX<T> operator*(const fem::math::UndefinedSizeMat& lhs, const fem::math::containers::VectorX<T>& rhs) {
+    int n = lhs.size();
+    fem::math::containers::VectorX<T> res(n);
+    for (int i = 0; i < n; ++i)
+        for (int j = 0; j < n; ++j)
+            res.data[i] += lhs[i][j] * rhs.data[j];
+    return res;
+}
+
+inline fem::math::UndefinedSizeMat operator/(const fem::math::UndefinedSizeMat& lhs, float rhs) {
+    fem::math::UndefinedSizeMat res = lhs;
+    int n = lhs.size();
+    for (int i = 0; i < n; ++i)
+        for (int j = 0; j < n; ++j)
+            res[i][j] = lhs[i][j] / rhs;
+    return res;
+}
+
+inline std::ostream& operator<<(std::ostream& ss, const fem::math::UndefinedSizeMat& mat) {
+    for (auto& x : mat) {
+        for (auto& y : x)
+            ss << y << " ";
+        ss << "\n";
+    }
+    return ss;
+}
+
+inline std::ostream& operator<<(std::ostream& ss, const fem::math::UndefinedSizeVec& vec) {
+    for (auto& x : vec) {
+        ss << x << ' ';
+    }
+    return ss;
 }
 
 inline std::ostream& operator<<(std::ostream& s, const fem::math::Mat2& m) {

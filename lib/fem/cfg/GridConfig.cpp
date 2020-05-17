@@ -1,4 +1,4 @@
-#include <fem/grid/GridConfig.h>
+#include <fem/cfg/GridConfig.h>
 
 #include <json/json.h>
 

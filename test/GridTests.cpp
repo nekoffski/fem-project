@@ -1,6 +1,6 @@
 #include <cmath>
+#include <fem/cfg/GridConfig.h>
 #include <fem/grid/Grid.h>
-#include <fem/grid/GridConfig.h>
 
 #include <gtest/gtest.h>
 
