@@ -21,6 +21,7 @@ public:
     void solveEquations();
     void printMinMaxTemperature(float time);
     void updateElement(grid::Element& element, std::vector<grid::Node>& nodes);
+    void resetMatrices();
 
 private:
     grid::Grid& m_grid;

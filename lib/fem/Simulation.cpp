@@ -19,10 +19,11 @@ void Simulation::run() {
     auto& nodes = m_grid.getNodes();
     auto& elements = m_grid.getElements();
 
+    for (auto& element : elements)
+        updateElement(element, nodes);
+    aggregateMatrices();
+
     for (float t = 0.0f; t < 100.0f; t += timestep) {
-        for (auto& element : elements)
-            updateElement(element, nodes);
-        aggregateMatrices();
         solveEquations();
         printMinMaxTemperature(t + timestep);
     }
@@ -61,9 +62,7 @@ void Simulation::solveEquations() {
 }
 
 void Simulation::aggregateMatrices() {
-    m_H.reset();
-    m_C.reset();
-    m_P.reset();
+    resetMatrices();
     for (const auto& element : m_grid.getElements()) {
         const auto& nodes = element.nodesIds;
         for (int i = 0; i < 4; ++i) {
@@ -74,6 +73,12 @@ void Simulation::aggregateMatrices() {
             m_P.data[nodes[i]] += element.P[i];
         }
     }
+}
+
+void Simulation::resetMatrices() {
+    m_H.reset();
+    m_C.reset();
+    m_P.reset();
 }
 
 void Simulation::printMinMaxTemperature(float time) {
