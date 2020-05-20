@@ -2,18 +2,27 @@
 
 #include <fem/Errors.h>
 #include <fem/Simulation.h>
+#include <fem/cfg/Config.h>
 #include <fem/grid/Grid.h>
 
 using namespace fem;
 
-int main() {
-    grid::GridConfig config{ 0.100f, 0.100f, 31, 31, 1.0f, 100.0f };
-    // grid::GridConfig config{ 0.100f, 0.100f, 4, 4, 50.0f, 500.0f };
+int main(int argc, char** argv) {
+    if (argc != 2)
+        throw std::logic_error("usage: ./fem `config.json`");
 
-    grid::Grid grid{ config };
-    grid.build();
+    try {
+        cfg::Config config(argv[1]);
 
-    fem::Simulation(grid).run();
+        grid::Grid grid{ config };
+        grid.build();
+
+        fem::Simulation(grid, config).run();
+
+    } catch (ConfigError& e) {
+        std::cout << "Error during loading config file\n";
+        return -1;
+    }
 
     return 0;
 }

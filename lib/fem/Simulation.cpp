@@ -1,21 +1,25 @@
 #include <fem/Simulation.h>
 
+#include <fem/Timer.hpp>
+#include <fem/math/MatrixSolver.hpp>
+
 namespace fem {
 
-Simulation::Simulation(grid::Grid& grid)
+Simulation::Simulation(grid::Grid& grid, cfg::SimulationConfig cfg)
     : m_grid(grid)
+    , m_cfg(std::move(cfg))
     , m_ue()
     , m_jacobianSolver(m_ue)
-    , m_temperature(31 * 31, 100.0f)
-    , m_C(31 * 31)
-    , m_H(31 * 31)
-    , m_P(31 * 31) {
+    , m_temperature(m_cfg.nodesCount, m_cfg.initialTemperature)
+    , m_C(m_cfg.nodesCount)
+    , m_H(m_cfg.nodesCount)
+    , m_P(m_cfg.nodesCount) {
 }
 
 void Simulation::run() {
     Timer timer("Total simulation time: ");
 
-    float timestep = 1.0f;
+    float timestep = m_cfg.timestep;
     auto& nodes = m_grid.getNodes();
     auto& elements = m_grid.getElements();
 
@@ -23,9 +27,9 @@ void Simulation::run() {
         updateElement(element, nodes);
     aggregateMatrices();
 
-    for (float t = 0.0f; t < 100.0f; t += timestep) {
+    for (float t = 0.0f; t < m_cfg.simulationTime; t += m_cfg.timestep) {
         solveEquations();
-        printMinMaxTemperature(t + timestep);
+        printMinMaxTemperature(t + m_cfg.timestep);
     }
 }
 
@@ -38,20 +42,22 @@ void Simulation::updateElement(grid::Element& element, std::vector<grid::Node>& 
     }
     auto [dx, dy, jacobians] = m_jacobianSolver.calculateDerivatives(points);
 
-    element.C = math::calculateCMatrix(m_ue.shapeFunctions, jacobians);
+    element.C = math::calculateCMatrix(m_ue.shapeFunctions, jacobians, m_cfg.specificHeat, m_cfg.density);
 
     auto boundaryJacobian = m_jacobianSolver.calculateBoundaryJacobian(points);
 
-    auto H = math::calculateHMatrix(dx, dy, jacobians);
-    auto HBC = math::calculateHBCMatrix(element.boundariesWithBC, m_ue.boundaryShapeFunctions, boundaryJacobian);
+    auto H = math::calculateHMatrix(dx, dy, jacobians, m_cfg.conductivity);
+    auto HBC = math::calculateHBCMatrix(element.boundariesWithBC,
+        m_ue.boundaryShapeFunctions, boundaryJacobian, m_cfg.alfa);
     element.H = std::move(H) + std::move(HBC);
 
-    auto P = math::calculatePVector(element.boundariesWithBC, m_ue.boundaryShapeFunctions, boundaryJacobian);
+    auto P = math::calculatePVector(element.boundariesWithBC, m_ue.boundaryShapeFunctions,
+        boundaryJacobian, m_cfg.alfa, m_cfg.ambientTemperature);
     element.P = std::move(P);
 }
 
 void Simulation::solveEquations() {
-    const float dt = 1.0f; // TODO: get from config
+    const float dt = m_cfg.timestep;
 
     auto Cdt = m_C / dt;
     auto Hc = m_H + Cdt;

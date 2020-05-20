@@ -1,3 +1,5 @@
+#pragma once
+
 #include <stdexcept>
 
 namespace fem {
@@ -5,6 +7,6 @@ namespace fem {
 struct Error : std::exception {
 };
 
-struct GridError : Error {
+struct ConfigError : Error {
 };
 }

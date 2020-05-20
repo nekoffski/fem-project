@@ -11,7 +11,7 @@ namespace fem::grid {
 
 class Grid {
 public:
-    explicit Grid(GridConfig cfg);
+    explicit Grid(cfg::GridConfig cfg);
     void build();
 
     std::vector<Node>& getNodes() {
@@ -36,7 +36,7 @@ private:
     std::vector<Node> m_nodes;
     std::vector<Element> m_elements;
 
-    GridConfig m_gridConfig;
+    cfg::GridConfig m_gridConfig;
 
     float m_dx;
     float m_dy;

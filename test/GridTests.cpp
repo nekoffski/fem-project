@@ -5,6 +5,7 @@
 #include <gtest/gtest.h>
 
 using namespace fem::grid;
+using namespace fem::cfg;
 
 class GridTests : public testing::Test {
 protected:

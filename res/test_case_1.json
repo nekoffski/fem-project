@@ -1,0 +1,18 @@
+{
+    "grid": {
+        "width": 0.1,
+        "height": 0.1,
+        "nodes_x": 4,
+        "nodes_y": 4
+    },
+    "simulation": {
+        "initial_temperature": 100,
+        "simulation_time": 500,
+        "timestep": 50,
+        "ambient_temperature": 1200,
+        "alfa": 300,
+        "specific_heat": 700,
+        "conductivity": 25,
+        "density": 7800
+    }
+}

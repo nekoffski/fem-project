@@ -13,7 +13,7 @@ static inline bool floatCmp(float x, float y) {
 
 namespace fem::grid {
 
-Grid::Grid(GridConfig cfg)
+Grid::Grid(cfg::GridConfig cfg)
     : m_gridConfig(std::move(cfg)) {
 }
 

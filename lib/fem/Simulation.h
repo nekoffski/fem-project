@@ -1,11 +1,10 @@
 #pragma once
 
-#include <fem/Timer.hpp>
+#include <fem/cfg/SimulationConfig.h>
 #include <fem/grid/Element.h>
 #include <fem/grid/Grid.h>
 #include <fem/grid/Node.h>
 #include <fem/math/JacobianSolver.h>
-#include <fem/math/MatrixSolver.hpp>
 #include <fem/math/UniversalElement.h>
 #include <fem/math/containers/Matrix.hpp>
 #include <fem/math/containers/Vector.hpp>
@@ -14,7 +13,7 @@ namespace fem {
 
 class Simulation {
 public:
-    explicit Simulation(grid::Grid& grid);
+    explicit Simulation(grid::Grid& grid, cfg::SimulationConfig cfg);
 
     void run();
     void aggregateMatrices();
@@ -25,6 +24,7 @@ public:
 
 private:
     grid::Grid& m_grid;
+    cfg::SimulationConfig m_cfg;
 
     math::containers::MatrixX<float> m_C;
     math::containers::MatrixX<float> m_H;
