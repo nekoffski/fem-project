@@ -10,8 +10,6 @@ namespace fem::math::containers {
 template <typename T>
 class VectorX {
 public:
-    std::vector<T> data;
-
     explicit VectorX() = default;
 
     explicit VectorX(Eigen::VectorX<T> eigen)
@@ -19,6 +17,14 @@ public:
         data.resize(m_size);
         for (int i = 0; i < m_size; ++i)
             data[i] = eigen(i);
+    }
+
+    T& operator[](int index) {
+        return data[index];
+    }
+
+    const T& operator[](int index) const {
+        return data[index];
     }
 
     explicit VectorX(std::size_t size, T defaultValue = static_cast<T>(0))
@@ -45,7 +51,7 @@ public:
     VectorX operator+(const VectorX& rhs) {
         VectorX<T> res = *this;
         for (int i = 0; i < m_size; ++i)
-            res.data[i] += rhs.data[i];
+            res[i] += rhs[i];
         return res;
     }
 
@@ -58,6 +64,7 @@ public:
     }
 
 private:
+    std::vector<T> data;
     std::size_t m_size;
 };
 }

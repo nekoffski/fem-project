@@ -12,9 +12,28 @@ namespace fem::math::containers {
 
 template <typename T>
 class MatrixX {
-public:
-    std::vector<std::vector<T>> data;
+    class Accessor {
+    public:
+        Accessor(std::vector<T>& data)
+            : data(data) {}
 
+        Accessor(const std::vector<T>& data)
+            : data(const_cast<std::vector<T>&>(data)) {
+        }
+
+        T& operator[](int index) {
+            return data[index];
+        }
+
+        const T& operator[](int index) const {
+            return data[index];
+        }
+
+    private:
+        std::vector<T>& data;
+    };
+
+public:
     explicit MatrixX() = default;
 
     explicit MatrixX(std::size_t size, T defaultValue = static_cast<T>(0))
@@ -22,6 +41,14 @@ public:
         data.resize(m_size);
         for (int i = 0; i < m_size; ++i)
             data[i].resize(m_size, defaultValue);
+    }
+
+    Accessor operator[](int index) {
+        return Accessor{ data[index] };
+    }
+
+    const Accessor operator[](int index) const {
+        return Accessor{ data[index] };
     }
 
     void reset() {
@@ -49,7 +76,7 @@ public:
         MatrixX<T> res = *this;
         for (int i = 0; i < m_size; ++i)
             for (int j = 0; j < m_size; ++j)
-                res.data[i][j] += rhs.data[i][j];
+                res[i][j] += rhs[i][j];
         return res;
     }
 
@@ -58,7 +85,7 @@ public:
         MatrixX<T> res = *this;
         for (int i = 0; i < m_size; ++i)
             for (int j = 0; j < m_size; ++j)
-                res.data[i][j] /= value;
+                res[i][j] /= value;
         return res;
     }
 
@@ -69,11 +96,12 @@ public:
         VectorX<T> res(n);
         for (int i = 0; i < n; ++i)
             for (int j = 0; j < n; ++j)
-                res.data[i] += data[i][j] * rhs.data[j];
+                res[i] += data[i][j] * rhs[j];
         return res;
     }
 
 private:
+    std::vector<std::vector<T>> data;
     std::size_t m_size;
 };
 }

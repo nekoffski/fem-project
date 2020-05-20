@@ -73,10 +73,10 @@ void Simulation::aggregateMatrices() {
         const auto& nodes = element.nodesIds;
         for (int i = 0; i < 4; ++i) {
             for (int j = 0; j < 4; ++j) {
-                m_H.data[nodes[i]][nodes[j]] += element.H[i][j];
-                m_C.data[nodes[i]][nodes[j]] += element.C[i][j];
+                m_H[nodes[i]][nodes[j]] += element.H[i][j];
+                m_C[nodes[i]][nodes[j]] += element.C[i][j];
             }
-            m_P.data[nodes[i]] += element.P[i];
+            m_P[nodes[i]] += element.P[i];
         }
     }
 }
