@@ -42,7 +42,7 @@ DerivativesTables JacobianSolver::calculateDerivatives(std::vector<Point> points
     auto [jac, dets] = calculateJacobians(points);
 
     for (int i = 0; i < 4; ++i) {
-        auto& j = jac[0];
+        auto& j = jac[i];
         for (int z = 0; z < 4; ++z) {
             xDerivatives[i][z] = j[0][0] * ue.dksi[i][z] + j[0][1] * ue.deta[i][z];
             yDerivatives[i][z] = j[1][0] * ue.dksi[i][z] + j[1][1] * ue.deta[i][z];
@@ -53,12 +53,12 @@ DerivativesTables JacobianSolver::calculateDerivatives(std::vector<Point> points
 
 std::vector<float> JacobianSolver::calculateBoundaryJacobian(std::vector<Point> points) {
     const auto n = points.size();
-    std::vector<float> res(n - 1);
+    std::vector<float> res(n);
 
     for (int i = 0; i < n; ++i) {
         const auto [xb, yb] = points[i];
         const auto [xe, ye] = points[(i + 1) % n];
-        res[i] = (std::abs(xe - xb) + std::abs(ye - yb)) / 2.0f;
+        res[i] = std::sqrt(std::pow(xe - xb, 2) + std::pow(ye - yb, 2)) / 2.0f;
     }
     return res;
 }

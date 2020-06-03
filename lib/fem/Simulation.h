@@ -9,6 +9,8 @@
 #include <fem/math/containers/Matrix.hpp>
 #include <fem/math/containers/Vector.hpp>
 
+#include <iostream>
+
 namespace fem {
 
 class Simulation {
@@ -16,13 +18,24 @@ public:
     explicit Simulation(grid::Grid& grid, cfg::SimulationConfig cfg);
 
     void run();
+
+private:
     void aggregateMatrices();
     void solveEquations();
     void printMinMaxTemperature(float time);
     void updateElement(grid::Element& element, std::vector<grid::Node>& nodes);
     void resetMatrices();
+    void updateTemperatureInNodes();
 
-private:
+    void printTemperatures() {
+        std::cout << "\n";
+        int ff = std::sqrt(m_cfg.nodesCount);
+        for (int i = 0; i < ff; ++i) {
+            std::cout << m_grid.getNodes()[i + i * ff].temp << "\n";
+        }
+        std::cout << "\n";
+    }
+
     grid::Grid& m_grid;
     cfg::SimulationConfig m_cfg;
 

@@ -16,7 +16,7 @@ struct Element {
     std::vector<int> nodesIds;
 
     std::vector<math::Boundary> boundariesWithBC;
-    math:: Mat4 H;
+    math::Mat4 H;
     math::Mat4 C;
     math::Vec4 P;
 };

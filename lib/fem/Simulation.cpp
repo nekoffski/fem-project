@@ -31,6 +31,7 @@ void Simulation::run() {
         solveEquations();
         printMinMaxTemperature(t + m_cfg.timestep);
     }
+    // printTemperatures();
 }
 
 void Simulation::updateElement(grid::Element& element, std::vector<grid::Node>& nodes) {
@@ -49,6 +50,7 @@ void Simulation::updateElement(grid::Element& element, std::vector<grid::Node>& 
     auto H = math::calculateHMatrix(dx, dy, jacobians, m_cfg.conductivity);
     auto HBC = math::calculateHBCMatrix(element.boundariesWithBC,
         m_ue.boundaryShapeFunctions, boundaryJacobian, m_cfg.alfa);
+
     element.H = std::move(H) + std::move(HBC);
 
     auto P = math::calculatePVector(element.boundariesWithBC, m_ue.boundaryShapeFunctions,
@@ -61,10 +63,11 @@ void Simulation::solveEquations() {
 
     auto Cdt = m_C / dt;
     auto Hc = m_H + Cdt;
-    auto C2 = Cdt * m_temperature;
-    auto B = C2 + m_P;
+    auto Ct = Cdt * m_temperature;
+    auto B = Ct + m_P;
 
     m_temperature = Hc.solve(std::move(B));
+    updateTemperatureInNodes();
 }
 
 void Simulation::aggregateMatrices() {
@@ -85,6 +88,12 @@ void Simulation::resetMatrices() {
     m_H.reset();
     m_C.reset();
     m_P.reset();
+}
+
+void Simulation::updateTemperatureInNodes() {
+    auto& nodes = m_grid.getNodes();
+    for (int i = 0; i < nodes.size(); ++i)
+        nodes[i].temp = m_temperature[i];
 }
 
 void Simulation::printMinMaxTemperature(float time) {

@@ -14,15 +14,12 @@ template <typename T>
 class MatrixX {
     class Accessor {
     public:
-        Accessor(std::vector<T>& data)
-            : data(data) {}
-
         Accessor(const std::vector<T>& data)
-            : data(const_cast<std::vector<T>&>(data)) {
+            : data(data) {
         }
 
         T& operator[](int index) {
-            return data[index];
+            return const_cast<std::vector<T>&>(data)[index];
         }
 
         const T& operator[](int index) const {
@@ -30,7 +27,7 @@ class MatrixX {
         }
 
     private:
-        std::vector<T>& data;
+        const std::vector<T>& data;
     };
 
 public:
